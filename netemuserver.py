@@ -3,7 +3,7 @@ import socket
 import threading
 import signal
 
-from tcp_server import TCPServer
+from tcp import TCPServer
 
 import argparse
 parser = argparse.ArgumentParser(description='NetEmu Server')
@@ -50,7 +50,7 @@ def main():
         while running:
             # Wait for connection and create listening thread
             try:
-                csock, con_info = server.accept()
+                csock, con_info = server.accept(1.0)
                 cthread = ThreadConnection(csock, *con_info)
                 cthread.start()
                 connections.append(cthread)
