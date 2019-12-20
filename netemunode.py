@@ -1,4 +1,5 @@
 import signal
+import socket
 from tcp import TCPServer, TCPClient, Timeout
 
 import argparse
@@ -11,9 +12,17 @@ parser.add_argument('--control', '-c', dest='control', default=8082, type=int, h
 # GLOBALS
 running = True
 
+def recv_timeout(socket, bufsize, timeout):
+    socket.settimeout(timeout)
+    try:
+        dat = socket.recv(bufsize)
+    except Timeout:
+        dat = None
+    return dat
+
 def close_handler(signal, reserved):
     global running
-    print("Closing client...")
+    print("\rClosing client...")
     running = False
 
 def main():
@@ -33,6 +42,21 @@ def main():
     # Connect to server
     with TCPClient(args.ip, args.port) as server:
         pass
+
+    while running:
+        # Receive loopback data
+        dat = recv_timeout(lsock, 4096, 0.1)
+        # Receive control data
+        dat = recv_timeout(csock, 4096, 0.1)
+        # Receive data from server
+        dat = recv_timeout(server.sock, 4096, 0.1)
+
+    # Cleanup
+    lsock.close()
+    csock.close()
+    server.stop()
+    loopback.stop()
+    control.stop()
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, close_handler)

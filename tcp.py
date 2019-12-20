@@ -4,9 +4,10 @@ import socket
 Timeout = socket.timeout
 
 class TCPServer():
-    def __init__(self, port, maxcon=1):
+    def __init__(self, port, maxcon=1, flags=0):
         self.port = port
         self.maxcon = maxcon
+        self.flags = flags
 
     def __enter__(self):
         self.start()
@@ -39,9 +40,10 @@ class TCPServer():
         return self.sock.accept()
 
 class TCPClient():
-    def __init__(self, address, port):
+    def __init__(self, address, port, flags=0):
         self.address = address
         self.port = port
+        self.flags = flags
 
     def __enter__(self):
         self.start()
@@ -66,3 +68,4 @@ class TCPClient():
 
     def recv(self, bufsize):
         return self.sock.recv(bufsize)
+
