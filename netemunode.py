@@ -13,6 +13,19 @@ parser.add_argument('--control', '-c', dest='control', default=8082, type=int, h
 # GLOBALS
 running = True
 
+# MESSAGE HANDLERS
+# ----------------
+def loopback_message(message:Message, server):
+    pass
+
+def control_message(message:Message, server):
+    pass
+
+def server_message(message:Message, loopback):
+    pass
+
+# ----------------
+
 def recv_timeout(socket, bufsize, timeout):
     socket.settimeout(timeout)
     try:
@@ -36,9 +49,19 @@ def main():
     with TCPServer(args.loopback) as loopback:
         lsock, _ = loopback.accept()
     # Open control server
-    with TCPServer(args.control) as control:
-        csock, _ = control.accept()
+    #with TCPServer(args.control) as control:
+    #    csock, _ = control.accept()
     print("Applicatio layer connected")
+
+    # receive buffers
+    lbuf = b''
+    cbuf = b''
+    sbuf = b''
+
+    # Receive messages
+    lmsg = None
+    cmsg = None
+    smsg = None
 
     # Connect to server
     with TCPClient(args.ip, args.port) as server:
@@ -46,27 +69,51 @@ def main():
             # Receive loopback data
             dat = recv_timeout(lsock, 4096, 0.1)
             if dat!=None and dat!=b'':
-                print('l>', str(dat, 'utf-8'))
+                lbuf += dat
             elif dat==b'':
                 # Application disconnected
                 running = False
                 print("Application layer disconnected")
+            # Create message object
+            if lmsg==None:
+                lmsg, lbuf = Message.recreate(lbuf)
+            elif not lmsg.done:
+                lbuf = lmsg.finish(lbuf)
+            if lmsg!=None and lmsg.done:
+                loopback_message(lmsg, server)
+                lmsg = None
 
             # Receive control data
             dat = recv_timeout(csock, 4096, 0.1)
             if dat!=None and dat!=b'':
-                print('c>', str(dat, 'utf-8'))
+                cbuf += dat
             elif dat==b'':
                 running = False
                 print("Application layer disconnected")
+            # Create message object
+            if cmsg==None:
+                cmsg, cbuf = Message.recreate(cbuf)
+            elif not cmsg.done:
+                cbuf = cmsg.finish(lbuf)
+            if cmsg!=None and cmsg.done:
+                control_message(cmsg, server)
+                cmsg = None
             
             # Receive data from server
             dat = server.recv_timeout(4096, 0.1)
             if dat!=None and dat!=b'':
-                print('s>', str(dat, 'utf-8'))
+                sbuf += dat
             elif dat==b'':
                 running = False
                 print("Server disconnected")
+            # Create message object
+            if smsg==None:
+                smsg, sbuf = Message.recreate(sbuf)
+            elif not cmsg.done:
+                sbuf = smsg.finish(sbuf)
+            if smsg!=None and smsg.done:
+                server_message(smsg, lsock)
+                smsg = None
 
     # Cleanup
     lsock.close()
