@@ -103,8 +103,8 @@ def main():
 
     with TCPServer(args.port, args.maxcon) as server:
 
-        #gui_thread = GuiThread(nodes)
-        #gui_thread.start()
+        gui_thread = GuiThread(nodes)
+        gui_thread.start()
 
         while running:
             # Wait for connection and create listening thread
@@ -116,7 +116,7 @@ def main():
             except socket.timeout:
                 continue
 
-        #gui_thread.stop()
+        gui_thread.stop()
         # Clean up all connections
         for conn in connections:
             if conn.running:
