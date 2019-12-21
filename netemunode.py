@@ -1,6 +1,7 @@
 import signal
 import socket
 from tcp import TCPServer, TCPClient, Timeout
+from message import Message
 
 import argparse
 parser = argparse.ArgumentParser(description='NetEmu Client')
