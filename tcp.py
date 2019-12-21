@@ -64,8 +64,8 @@ class TCPClient():
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.connect((self.address, self.port))
-        except:
-            print("Could not connect to socket")
+        except Exception as e:
+            print("Could not connect to socket: %s"%str(e))
             sys.exit(0)
 
     def stop(self):

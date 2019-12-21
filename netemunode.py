@@ -1,5 +1,6 @@
 import signal
 import socket
+import struct
 from tcp import TCPServer, TCPClient, Timeout
 from message import Message
 
@@ -13,16 +14,32 @@ parser.add_argument('--control', '-c', dest='control', default=8082, type=int, h
 # GLOBALS
 running = True
 
+# NODE PARAMETERS
+# ---------------
+node_tx_power = 0.0
+node_pos = (0.0,0.0)
+# ---------------
+
 # MESSAGE HANDLERS
 # ----------------
 def loopback_message(message:Message, server):
-    pass
+    dat = b'\x00' + message.data
+    msg = Message.create(dat)
+    server.send(msg.packet())
 
 def control_message(message:Message, server):
-    pass
+    global node_tx_power, node_pos
+    s = struct.unpack('ddd', message.data)
+    node_tx_power = s[0]
+    node_pos = (s[1],s[2])
+
+    # Send to-server-message type message
+    dat = b'\x01' + message.data
+    msg = Message.create(dat)
+    server.send(msg.packet())
 
 def server_message(message:Message, loopback):
-    pass
+    loopback.send(message.packet())
 
 # ----------------
 
@@ -49,8 +66,8 @@ def main():
     with TCPServer(args.loopback) as loopback:
         lsock, _ = loopback.accept()
     # Open control server
-    #with TCPServer(args.control) as control:
-    #    csock, _ = control.accept()
+    with TCPServer(args.control) as control:
+        csock, _ = control.accept()
     print("Applicatio layer connected")
 
     # receive buffers
@@ -120,6 +137,7 @@ def main():
     csock.close()
     loopback.stop()
     control.stop()
+    server.stop()
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, close_handler)
