@@ -41,20 +41,35 @@ def main():
 
     # Connect to server
     with TCPClient(args.ip, args.port) as server:
-        pass
+        while running:
+            # Receive loopback data
+            dat = recv_timeout(lsock, 4096, 0.1)
+            if dat!=None and dat!=b'':
+                print('l>', str(dat, 'utf-8'))
+            elif dat==b'':
+                # Application disconnected
+                running = False
+                print("Application layer disconnected")
 
-    while running:
-        # Receive loopback data
-        dat = recv_timeout(lsock, 4096, 0.1)
-        # Receive control data
-        dat = recv_timeout(csock, 4096, 0.1)
-        # Receive data from server
-        dat = recv_timeout(server.sock, 4096, 0.1)
+            # Receive control data
+            dat = recv_timeout(csock, 4096, 0.1)
+            if dat!=None and dat!=b'':
+                print('c>', str(dat, 'utf-8'))
+            elif dat==b'':
+                running = False
+                print("Application layer disconnected")
+            
+            # Receive data from server
+            dat = server.recv_timeout(4096, 0.1)
+            if dat!=None and dat!=b'':
+                print('s>', str(dat, 'utf-8'))
+            elif dat==b'':
+                running = False
+                print("Server disconnected")
 
     # Cleanup
     lsock.close()
     csock.close()
-    server.stop()
     loopback.stop()
     control.stop()
 

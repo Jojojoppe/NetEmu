@@ -28,11 +28,19 @@ class TCPServer():
     def stop(self):
         self.sock.close()
 
-    def write(self, data):
+    def send(self, data):
         self.sock.send(data)
 
     def recv(self, bufsize):
         return self.sock.recv(bufsize)
+
+    def recv_timeout(self, bufsize, timeout):
+        self.sock.settimeout(timeout)
+        try:
+            dat = self.sock.recv(bufsize)
+        except Timeout:
+            dat = None
+        return dat
 
     def accept(self, timeout=None):
         if timeout!=None:
@@ -63,9 +71,17 @@ class TCPClient():
     def stop(self):
         self.sock.close()
 
-    def write(self, data):
+    def send(self, data):
         self.sock.send(data)
 
     def recv(self, bufsize):
         return self.sock.recv(bufsize)
+
+    def recv_timeout(self, bufsize, timeout):
+        self.sock.settimeout(timeout)
+        try:
+            dat = self.sock.recv(bufsize)
+        except Timeout:
+            dat = None
+        return dat
 
