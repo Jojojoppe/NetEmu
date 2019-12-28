@@ -18,7 +18,7 @@ control.start()
 x = (random.random()-0.5)*10.0
 y = (random.random()-0.5)*10.0
 
-cdat = b'\x01' + struct.pack('ddd', 1.5, x, y)
+cdat = b'\x01' + struct.pack('<d<d<d', 1.5, x, y)
 cmsg = Message.create(cdat)
 control.send(cmsg.packet())
 

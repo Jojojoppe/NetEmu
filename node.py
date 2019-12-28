@@ -42,7 +42,7 @@ class Node():
 
     # Control message is received
     def on_control_message(self, msg:bytes):
-        s = struct.unpack('ddd', msg)
+        s = struct.unpack('<d<d<d', msg)
         self.tx_power = s[0]
         self.position = (s[1], s[2])
         self.precalcFSPL()
