@@ -97,6 +97,7 @@ def main():
     args = parser.parse_args()
 
     print('NetEmu Server')
+    print('Ctr-C to close')
 
     # List of all connections (active and non-active)
     connections = []
