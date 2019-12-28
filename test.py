@@ -11,10 +11,10 @@ def close_handler(signal, reserved):
 
 signal.signal(signal.SIGINT, close_handler)
 
-control = TCPClient('127.0.0.1', 8081)
+control = TCPClient('127.0.0.1', 8080)
 control.start()
 
-cdat = struct.pack('Bddd', 1, 1.5, 0.0, 0.0)
+cdat = b'\x01' + struct.pack('ddd', 1.5, 0.0, 0.0)
 cmsg = Message.create(cdat)
 control.send(cmsg.packet())
 
