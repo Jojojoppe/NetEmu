@@ -8,8 +8,8 @@ class GuiThread(threading.Thread):
         self.nodes = nodes
         self.running = True
 
-        self.width = 400
-        self.height = 300
+        self.width = 800
+        self.height = 600
         pygame.init()
         self.fpsCam = pygame.time.Clock()
         self.window = pygame.display.set_mode((self.width, self.height), 0, 32)

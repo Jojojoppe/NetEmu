@@ -21,8 +21,8 @@ class TCPServer():
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.bind(('localhost', self.port))
             self.sock.listen(self.maxcon)
-        except:
-            print("Could not connect to socket")
+        except Exception as e:
+            print("Could not connect to socket: %s"%str(e))
             sys.exit(0)
 
     def stop(self):
