@@ -1,6 +1,7 @@
 import struct
 import math
 from message import Message
+from packet_loss import packet_loss
 
 class Node():
     def __init__(self, nodes, message_buffer, index, config):
@@ -12,11 +13,32 @@ class Node():
         self.index = index                      # Index of self in nodes dictionary
         self.config = config                    # Config dictionary
 
+        self.loss = float(config.get('radio', 'loss', fallback='0.0'))
+        self.noise_floor = float(config.get('radio', 'noise_floor', fallback='-80.0'))
         self.precalcFSPL()
 
     # Data message is received
     def on_data_message(self, msg:bytes):
-        pass
+        # rssi = int(msg[0]) : not read here: must be calculated at sending to other nodes
+        data = msg[1:]
+        
+        # Loop over nodes
+        for index, node in self.nodes.items():
+            if index==self.index:
+                continue
+            # Calculate distance
+            nx,ny = node.position
+            mx,my = self.position
+            dist = math.sqrt((nx-mx)*(nx-mx) + (ny-my)*(ny-my))
+            # Calculate RSSI
+            rssi = int(node.calcRSSI(dist))
+            # If RSSI is bigger then noise floor
+            if rssi>self.noise_floor:
+                # If packet is received at the other end
+                if packet_loss(rssi-self.noise_floor):
+                    d = b'\x00' + struct.pack('b', rssi) + data
+                    m = Message.create(d)
+                    node.send(msg.packet())
 
     # Control message is received
     def on_control_message(self, msg:bytes):
@@ -39,7 +61,7 @@ class Node():
 
     # Calculate Received signal strength
     def calcRSSI(self, distance):
-        FSPL = self.FSPL/(distance*distance)
+        FSPL = self.loss*self.FSPL/(distance*distance)
         rssi = FSPL*self.tx_power
         return 20*math.log10(rssi)
 

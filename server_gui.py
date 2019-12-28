@@ -10,7 +10,7 @@ class GuiThread(threading.Thread):
         self.running = True
 
         self.width = int(config.get('gui', 'window_size', fallback=400))
-        self.height = self.height
+        self.height = self.width
         pygame.init()
         self.fpsCam = pygame.time.Clock()
         self.window = pygame.display.set_mode((self.width, self.height), 0, 32)
