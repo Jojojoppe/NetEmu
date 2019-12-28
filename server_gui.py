@@ -1,6 +1,6 @@
 import threading
 import numpy as np
-import pygame
+import sdl2.ext as sdl
 
 class GuiThread(threading.Thread):
     def __init__(self, nodes):
@@ -8,20 +8,22 @@ class GuiThread(threading.Thread):
         self.nodes = nodes
         self.running = True
 
-        pygame.init()
-        self.fpsClock = pygame.time.Clock()
-        self.window = pygame.display.set_mode((400, 300), 0, 32)
-        pygame.display.set_caption('NetEmu Server')
+        # GUI data
+        self.gui_data = np.zeros([600,600,3])
+        self.zoom_level = 1.0
+
+        sdl.init()
+        self.window = sdl.Window("NetEmu Server", size=(800, 600))
+        self.renderer = sdl.Renderer(self.window)
 
     def run(self):
         # Render gui
+        self.window.show()
+        self.renderer.clear(0)
         while self.running:
-            self.window.fill((255, 255, 255))
-            
-            pygame.display.update()
-            self.fpsClock.tick(30)
-
-        pygame.quit()
+            events = sdl.get_events()
+            self.renderer.present()
+        sdl.quit()
 
     def stop(self):
         self.running = False
