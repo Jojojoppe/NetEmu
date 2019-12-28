@@ -1,5 +1,6 @@
 import signal
 import struct
+import random
 from tcp import TCPClient
 from message import Message
 
@@ -14,7 +15,10 @@ signal.signal(signal.SIGINT, close_handler)
 control = TCPClient('127.0.0.1', 8080)
 control.start()
 
-cdat = b'\x01' + struct.pack('ddd', 1.5, 0.0, 0.0)
+x = (random.random()-0.5)*10.0
+y = (random.random()-0.5)*10.0
+
+cdat = b'\x01' + struct.pack('ddd', 1.5, x, y)
 cmsg = Message.create(cdat)
 control.send(cmsg.packet())
 
