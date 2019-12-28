@@ -2,6 +2,7 @@ import sys
 import socket
 import threading
 import signal
+import configparser
 
 from tcp import TCPServer
 from message import Message
@@ -10,16 +11,16 @@ from server_gui import GuiThread
 
 import argparse
 parser = argparse.ArgumentParser(description='NetEmu Server')
-parser.add_argument('--port', '-p', dest='port', default=8080, type=int, help='the port of the NetEmu server')
-parser.add_argument('--maxcon', '-n', dest='maxcon', default=10, type=int, help='maximum amount of connections on the NetEmu server')
+parser.add_argument('config_file', default='config.ini', type=str, help='Config file')
 
 # GLOBALS
 running = True
 nodes = {}
+config = {}
 
 class ThreadConnection(threading.Thread):
     def __init__(self, socket, address, port):
-        global nodes
+        global nodes, config
         threading.Thread.__init__(self, name='%s%d'%(address,port))
         self.socket = socket
         self.address = address
@@ -27,7 +28,7 @@ class ThreadConnection(threading.Thread):
         self.running = False
         self.node_idx = '%s%d'%(address, port)
         self.message_buffer = []
-        nodes[self.node_idx] = Node(nodes, self.message_buffer, self.node_idx)
+        nodes[self.node_idx] = Node(nodes, self.message_buffer, self.node_idx, config)
 
     def __del__(self):
         self.socket.close()
@@ -61,7 +62,6 @@ class ThreadConnection(threading.Thread):
                 buf = msg.finish(buf)
             if msg!=None and msg.done:
                 # Message received
-                # TODO DO SOMETHING WITH DATA
                 # ----------------
                 print('%s:%d > %s'%(self.address, self.port, str(msg.data)))
                 if msg.data[0]==0:
@@ -93,16 +93,22 @@ def close_handler(signal, reserved):
     running = False
 
 def main():
-    global running
+    global running, config
     args = parser.parse_args()
 
     print('NetEmu Server')
     print('Ctr-C to close')
 
+    # Get configuration
+    config = configparser.ConfigParser()
+    config.read(args.config_file)
+    port = config.get('connection', 'port', fallback='8080')
+    maxcon = config.get('connection', 'maxcon', fallback='10')
+
     # List of all connections (active and non-active)
     connections = []
 
-    with TCPServer(args.port, args.maxcon) as server:
+    with TCPServer(int(port), int(maxcon)) as server:
 
         gui_thread = GuiThread(nodes)
         gui_thread.start()

@@ -2,13 +2,14 @@ import struct
 from message import Message
 
 class Node():
-    def __init__(self, nodes, message_buffer, index):
+    def __init__(self, nodes, message_buffer, index, config):
         self.tx_power = 0.0
         self.position = (0.0, 0.0)
 
         self.nodes = nodes                      # Global nodes dictionary
         self.message_buffer = message_buffer    # Sending message buffer array
         self.index = index                      # Index of self in nodes dictionary
+        self.config = config                    # Config dictionary
 
     # Data message is received
     def on_data_message(self, msg:bytes):
