@@ -25,6 +25,7 @@ class GuiThread(threading.Thread):
             for nodename, node in self.nodes.items():
                 x,y = self.get_screen_position(node.position)
                 pygame.draw.circle(self.window, (255, 0, 0), (int(x), int(y)), 2, 0)
+                pygame.draw.circle(self.window, (0, 0, 255), (int(x), int(y)), int(self.zoom*1.5), 1)
 
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:
