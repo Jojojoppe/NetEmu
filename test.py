@@ -11,8 +11,8 @@ def close_handler(signal, reserved):
 
 signal.signal(signal.SIGINT, close_handler)
 
-loopback = TCPClient('127.0.0.1', 8081)
-loopback.start()
+#loopback = TCPClient('127.0.0.1', 8081)
+#loopback.start()
 control = TCPClient('127.0.0.1', 8082)
 control.start()
 
