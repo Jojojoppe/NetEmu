@@ -110,7 +110,7 @@ def main():
 
     with TCPServer(int(port), int(maxcon)) as server:
 
-        gui_thread = GuiThread(nodes)
+        gui_thread = GuiThread(nodes, config)
         gui_thread.start()
 
         while running:
