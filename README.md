@@ -18,7 +18,7 @@ Two types of packets can be sent to NetEmu: control packets and data packets, ea
 | RSSI       | 1      | -          | char   |
 | DATA       | -      | -          | -      |
 
-#### data packet
+#### config packet
 | Field name | Length | Endianness | Type   |
 |------------|--------|------------|--------|
 | Length     | 4      | little     | int    |
