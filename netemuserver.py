@@ -34,9 +34,10 @@ class ThreadConnection(threading.Thread):
         self.socket.close()
 
     def run(self):
-        global nodes
+        global nodes, config
         self.running = True
-        print("> Connection opened from %s:%d"%(self.address,self.port))
+        if config.get('logging', 'connection_status', fallback='false')=='true':
+            print("> Connection opened from %s:%d"%(self.address,self.port))
         buf = b''
         msg = None
         while self.running:
@@ -54,7 +55,8 @@ class ThreadConnection(threading.Thread):
                 # Node disconnected
                 self.running = False
                 nodes.pop(self.node_idx)
-                print("> Connection closed %s:%d"%(self.address,self.port))
+                if config.get('logging', 'connection_status', fallback='false')=='true':
+                    print("> Connection closed %s:%d"%(self.address,self.port))
             # Create message object
             if msg==None:
                 msg, buf = Message.recreate(buf)
@@ -63,7 +65,8 @@ class ThreadConnection(threading.Thread):
             if msg!=None and msg.done:
                 # Message received
                 # ----------------
-                print('%s:%d > %s'%(self.address, self.port, str(msg.data)))
+                if config.get('logging', 'raw_message', fallback='false')=='true':
+                    print('%s:%d > %s'%(self.address, self.port, str(msg.data)))
                 if msg.data[0]==0:
                     # DATA
                     nodes[self.node_idx].on_data_message(msg.data[1:])

@@ -35,10 +35,12 @@ class GuiThread(threading.Thread):
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:
                     self.zoom *= self.zoom_speed
-                    print("Zoom: ", self.zoom)
+                    if self.config.get('logging', 'zooming', fallback='false')=='true':
+                        print("Zoom: ", self.zoom)
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 5:
                     self.zoom /= self.zoom_speed
-                    print("Zoom: ", self.zoom)
+                    if self.config.get('logging', 'zooming', fallback='false')=='true':
+                        print("Zoom: ", self.zoom)
 
             pygame.display.update()
             self.fpsCam.tick(30)

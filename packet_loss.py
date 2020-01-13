@@ -4,6 +4,5 @@
 def packet_loss(self, SNR=0, func='none'):
     if(func=='none'):
         return False
-        
     else:
         raise Exception('%s packet loss function not known')
