@@ -1,6 +1,7 @@
 import signal
 import struct
 import random
+import time
 from tcp import TCPClient
 from message import Message
 
@@ -18,11 +19,16 @@ control.start()
 x = (random.random()-0.5)*10.0
 y = (random.random()-0.5)*10.0
 
-cdat = b'\x01' + struct.pack('<d<d<d', 1.5, x, y)
+cdat = b'\x01' + struct.pack('<ddd', 1.5, x, y)
 cmsg = Message.create(cdat)
 control.send(cmsg.packet())
 
 while running:
-    pass
+    time.sleep(0.05)
+    x += (random.random()-0.5)*0.2
+    y += (random.random()-0.5)*0.2
+    cdat = b'\x01' + struct.pack('<ddd', 1.5, x, y)
+    cmsg = Message.create(cdat)
+    control.send(cmsg.packet())
 
 control.stop()
