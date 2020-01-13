@@ -15,6 +15,7 @@ class Node():
 
         self.loss = float(config.get('radio', 'loss', fallback='0.0'))
         self.noise_floor = float(config.get('radio', 'noise_floor', fallback='-80.0'))
+        self.packet_loss_function = config.get('radio', 'packet_loss_function', fallback='none')
         self.precalcFSPL()
 
     # Data message is received
@@ -35,7 +36,7 @@ class Node():
             # If RSSI is bigger then noise floor
             if rssi>self.noise_floor:
                 # If packet is received at the other end
-                if packet_loss(rssi-self.noise_floor):
+                if packet_loss(rssi-self.noise_floor, self.packet_loss_function):
                     d = b'\x00' + struct.pack('b', rssi) + data
                     m = Message.create(d)
                     node.send(msg.packet())
