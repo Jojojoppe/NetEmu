@@ -18,8 +18,12 @@ class Node():
         self.packet_loss_function = config.get('radio', 'packet_loss_function', fallback='none')
         self.precalcFSPL()
 
+        self.rx_dat = False
+        self.rx_ctl = False
+
     # Data message is received
     def on_data_message(self, msg:bytes):
+        self.rx_dat = True
         # rssi = int(msg[0]) : not read here: must be calculated at sending to other nodes
         data = msg[1:]
         
@@ -43,6 +47,7 @@ class Node():
 
     # Control message is received
     def on_control_message(self, msg:bytes):
+        self.rx_ctl = True
         s = struct.unpack('<ddd', msg)
         self.tx_power = s[0]
         self.position = (s[1], s[2])

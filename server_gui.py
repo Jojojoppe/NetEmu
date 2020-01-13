@@ -29,8 +29,17 @@ class GuiThread(threading.Thread):
                 pygame.draw.circle(self.window, (255, 0, 0), (int(x), int(y)), 2, 0)
 
                 # Draw -40dBm line
+                clr = (0,0,255)
+                if node.rx_dat:
+                    node.rx_dat = False
+                    if self.config.get('gui', 'clr_change_dat', fallback='true')=='true':
+                        clr = (255,0,0)
+                elif node.rx_ctl:
+                    node.rx_ctl = False
+                    if self.config.get('gui', 'clr_change_ctl', fallback='true')=='true':
+                        clr = (0,255,0)
                 d = node.calc_dist(self.tx_line)
-                pygame.draw.circle(self.window, (0, 0, 255), (int(x), int(y)), int(self.get_screen_length(d)), 1)
+                pygame.draw.circle(self.window, clr, (int(x), int(y)), int(self.get_screen_length(d)), 1)
 
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:
@@ -43,7 +52,7 @@ class GuiThread(threading.Thread):
                         print("Zoom: ", self.zoom)
 
             pygame.display.update()
-            self.fpsCam.tick(30)
+            self.fpsCam.tick(15)
         pygame.quit()
 
     def stop(self):
