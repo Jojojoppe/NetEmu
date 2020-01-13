@@ -64,13 +64,13 @@ class Node():
         Dt = float(self.config.get('radio', 'directivity_transmitter', fallback='1.0'))
         Dr = float(self.config.get('radio', 'directivity_receiver', fallback='1.0'))
         wavelength = float(self.config.get('radio', 'wavelength', fallback='1000'))/1000
-        self.FSPL = Dt*Dr*wavelength*wavelength/39.4784176
+        self.FSPL = self.loss*Dt*Dr*wavelength*wavelength/39.4784176
         if self.config.get('logging', 'FSPL', fallback='false')=='true':
             print("[%s] FSPL=%f"%(self.index, self.FSPL))
 
     # Calculate Received signal strength
     def calcRSSI(self, distance):
-        FSPL = self.loss*self.FSPL/(distance*distance)
+        FSPL = self.FSPL/(distance*distance)
         rssi = FSPL*self.tx_power
         return 20*math.log10(rssi)
 

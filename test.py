@@ -26,8 +26,8 @@ control.send(cmsg.packet())
 cnt=0
 while running:
     time.sleep(0.05)
-    x += (random.random()-0.5)*0.2
-    y += (random.random()-0.5)*0.2
+    x += (random.random()-0.5)*0.5
+    y += (random.random()-0.5)*0.5
     cdat = b'\x01' + struct.pack('<ddd', 1.5, x, y)
     cmsg = Message.create(cdat)
     control.send(cmsg.packet())
