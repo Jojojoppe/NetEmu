@@ -43,7 +43,7 @@ class Node():
                 if packet_loss(rssi-self.noise_floor, self.packet_loss_function):
                     d = b'\x00' + struct.pack('b', rssi) + data
                     m = Message.create(d)
-                    node.send(msg.packet())
+                    node.send(m.packet())
 
     # Control message is received
     def on_control_message(self, msg:bytes):
@@ -55,6 +55,8 @@ class Node():
 
     # Send a message to this node
     def send(self, msg:Message):
+        if self.config.get('logging', 'rec_msg', fallback='true')=='true':
+            print('[%s] rec: %s'%(str(self.index), str(msg)))
         self.message_buffer.append(msg)
 
     # Calculate part of free space path loss
