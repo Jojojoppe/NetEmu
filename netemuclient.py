@@ -42,7 +42,7 @@ class NetEmuClient(threading.Thread):
                 # ----------------
                 if msg.data[0]==0:
                     # DATA received
-                    self.recv_func(msg.data[1:])
+                    self.recv_func(msg.data[2:], int(msg.data[1]))
                 else:
                     # UNKNOWN
                     pass
@@ -81,11 +81,17 @@ class NetEmuClient(threading.Thread):
         cmsg = Message.create(cdat)
         self.client.send(cmsg.packet())
 
-def recv(packet=b''):
-    print(packet)
+def recv(packet=b'', rssi=0):
+    print(rssi, packet)
 
 if __name__=="__main__":
-    cl = NetEmuClient(recv, "130.89.80.119", 8080)
+
+    # Get server IP
+    f=open('../server.ip')
+    ip=f.read()
+    f.close()
+
+    cl = NetEmuClient(recv, ip, 8080)
     cl.start()
     while True:
         i=input()
