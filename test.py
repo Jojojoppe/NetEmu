@@ -13,7 +13,7 @@ def close_handler(signal, reserved):
 
 signal.signal(signal.SIGINT, close_handler)
 
-control = TCPClient('127.0.0.1', 8080)
+control = TCPClient('130.89.80.119', 8080)
 control.start()
 
 x = (random.random()-0.5)*10.0

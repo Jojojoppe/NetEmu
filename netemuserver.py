@@ -43,9 +43,10 @@ class ThreadConnection(threading.Thread):
         while self.running:
 
             # Send data if possible
-            for m in self.message_buffer:
-                self.socket.send(m.packet())
-            self.message_buffer = []
+            for m in nodes[self.node_idx].message_buffer:
+                print("Send [%s]: %s"%(self.node_idx, m))
+                self.socket.send(m)
+            nodes[self.node_idx].message_buffer = []
 
             # Receive data
             dat = self.recv_timeout(4096, 0.1)
@@ -107,11 +108,12 @@ def main():
     config.read(args.config_file)
     port = config.get('connection', 'port', fallback='8080')
     maxcon = config.get('connection', 'maxcon', fallback='10')
+    ip = config.get('connection', 'ip', fallback="localhost")
 
     # List of all connections (active and non-active)
     connections = []
 
-    with TCPServer(int(port), int(maxcon)) as server:
+    with TCPServer(int(port), int(maxcon), ip=ip) as server:
 
         gui_thread = GuiThread(nodes, config)
         gui_thread.start()

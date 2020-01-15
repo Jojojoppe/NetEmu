@@ -70,7 +70,10 @@ class Node():
 
     # Calculate Received signal strength
     def calcRSSI(self, distance):
-        FSPL = self.FSPL/(distance*distance)
+        if distance==0.0:
+            FSPL = 1.0
+        else:
+            FSPL = self.FSPL/(distance*distance)
         rssi = FSPL*self.tx_power
         return 20*math.log10(rssi)
 

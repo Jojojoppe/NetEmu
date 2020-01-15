@@ -4,10 +4,11 @@ import socket
 Timeout = socket.timeout
 
 class TCPServer():
-    def __init__(self, port, maxcon=1, flags=0):
+    def __init__(self, port, maxcon=1, ip="localhost", flags=0):
         self.port = port
         self.maxcon = maxcon
         self.flags = flags
+        self.ip = ip
 
     def __enter__(self):
         self.start()
@@ -19,7 +20,7 @@ class TCPServer():
     def start(self):
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.sock.bind(('localhost', self.port))
+            self.sock.bind((self.ip, self.port))
             self.sock.listen(self.maxcon)
         except Exception as e:
             print("Could not connect to socket: %s"%str(e))
