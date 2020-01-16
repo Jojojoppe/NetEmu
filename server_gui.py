@@ -24,6 +24,9 @@ class GuiThread(threading.Thread):
         while self.running:
             self.window.fill((255, 255, 255))
 
+            # Draw environment
+            self.draw_environment()
+
             for nodename, node in self.nodes.items():
                 x,y = self.get_screen_position(node.position)
                 pygame.draw.circle(self.window, (255, 0, 0), (int(x), int(y)), 2, 0)
@@ -70,3 +73,17 @@ class GuiThread(threading.Thread):
 
     def get_screen_length(self, length):
         return ((self.zoom*length))*(self.height/2)
+
+    # ENVIRONMENT
+    env = [
+        # (x,y)1        (x,y)2          (R,G,B)     w
+        ((-8.0,-8.0),   (-8.0,8.0),     (0,0,0),    4),
+        ((-8.0,-8.0),   (8.0,-8.0),     (0,0,0),    4),
+        ((8.0,8.0),     (-8.0,8.0),     (0,0,0),    4),
+        ((8.0,8.0),     (8.0,-8.0),     (0,0,0),    4),
+    ]
+
+    def draw_environment(self):
+        for e in self.env:
+            p1, p2, clr, w = e
+            pygame.draw.line(self.window, clr, self.get_screen_position(p1), self.get_screen_position(p2), w)
