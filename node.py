@@ -21,9 +21,12 @@ class Node():
         self.rx_dat = False
         self.rx_ctl = False
 
+        self.tx_list = []
+
     # Data message is received
     def on_data_message(self, msg:bytes):
         self.rx_dat = True
+        self.tx_list = []
         # rssi = int(msg[0]) : not read here: must be calculated at sending to other nodes
         data = msg[1:]
         
@@ -44,6 +47,7 @@ class Node():
                     d = b'\x00' + struct.pack('b', rssi) + data
                     m = Message.create(d)
                     node.send(m.packet())
+                    self.tx_list.append(node.position)
 
     # Control message is received
     def on_control_message(self, msg:bytes):
