@@ -83,4 +83,4 @@ class Node():
 
     # Calculate distance from node with specific RSSI
     def calc_dist(self, rssi):
-        return math.sqrt((self.FSPL*self.tx_power)/math.pow(10, (rssi/20)))
+        return math.sqrt((self.FSPL*self.tx_power)/math.pow(10, (rssi/20.0)))

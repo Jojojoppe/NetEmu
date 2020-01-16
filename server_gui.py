@@ -18,7 +18,8 @@ class GuiThread(threading.Thread):
 
         self.zoom = float(config.get('gui', 'zoom', fallback='1.0'))
         self.zoom_speed = float(config.get('gui', 'zoom_speed', fallback='1.1'))
-        self.tx_line = int(config.get('gui', 'tx_line', fallback='-40'))
+        self.tx_line1 = int(config.get('gui', 'tx_line1', fallback='-40'))
+        self.tx_line2 = int(config.get('gui', 'tx_line2', fallback='-80'))
 
     def run(self):
         # Render gui
@@ -46,7 +47,10 @@ class GuiThread(threading.Thread):
                     node.rx_ctl = False
                     if self.config.get('gui', 'clr_change_ctl', fallback='true')=='true':
                         clr = (0,255,0)
-                d = node.calc_dist(self.tx_line)
+                d = node.calc_dist(self.tx_line1)
+                pygame.draw.circle(self.window, clr, (int(x), int(y)), int(self.get_screen_length(d)), 1)
+                d = node.calc_dist(self.tx_line2)
+                clr=(180,180,255)
                 pygame.draw.circle(self.window, clr, (int(x), int(y)), int(self.get_screen_length(d)), 1)
 
             for event in pygame.event.get():

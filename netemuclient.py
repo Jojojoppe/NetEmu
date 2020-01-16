@@ -1,5 +1,6 @@
 import struct
 import threading
+import random
 from message import Message
 from tcp import TCPClient
 
@@ -42,7 +43,8 @@ class NetEmuClient(threading.Thread):
                 # ----------------
                 if msg.data[0]==0:
                     # DATA received
-                    self.recv_func(msg.data[2:], int(msg.data[1]))
+                    rssi = struct.unpack('b', msg.data[1:2])[0]
+                    self.recv_func(msg.data[2:], rssi)
                 else:
                     # UNKNOWN
                     pass
@@ -66,7 +68,7 @@ class NetEmuClient(threading.Thread):
     def position(self, x=0.0, y=0.0):
         self.x = x
         self.y = y
-        self._sendControl
+        self._sendControl()
 
     """Update transmission power
     """
@@ -91,8 +93,14 @@ if __name__=="__main__":
     ip=f.read()
     f.close()
 
+    x = (random.random()-0.5)*16.0
+    y = (random.random()-0.5)*16.0
+
     cl = NetEmuClient(recv, ip, 8080)
     cl.start()
+    cl.position(x, y)
+    cl.txpower(0.1)
+
     while True:
         i=input()
         cl.send(bytes(i, 'utf-8'))
