@@ -9,8 +9,9 @@ class GuiThread(threading.Thread):
         self.config = config
         self.running = True
 
-        self.width = int(config.get('gui', 'window_size', fallback=400))
-        self.height = self.width
+        self.width = int(config.get('gui', 'window_size_x', fallback=400))
+        self.height = int(config.get('gui', 'window_size_y', fallback=400))
+        self.scaler = self.height
         pygame.init()
         self.fpsCam = pygame.time.Clock()
         self.window = pygame.display.set_mode((self.width, self.height), 0, 32)
@@ -50,13 +51,15 @@ class GuiThread(threading.Thread):
 
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:
-                    self.zoom *= self.zoom_speed
-                    if self.config.get('logging', 'zooming', fallback='false')=='true':
-                        print("Zoom: ", self.zoom)
+                    if self.zoom_speed != 0.0:
+                        self.zoom *= self.zoom_speed
+                        if self.config.get('logging', 'zooming', fallback='false')=='true':
+                            print("Zoom: ", self.zoom)
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 5:
-                    self.zoom /= self.zoom_speed
-                    if self.config.get('logging', 'zooming', fallback='false')=='true':
-                        print("Zoom: ", self.zoom)
+                    if self.zoom_speed != 0.0:
+                        self.zoom /= self.zoom_speed
+                        if self.config.get('logging', 'zooming', fallback='false')=='true':
+                            print("Zoom: ", self.zoom)
 
             pygame.display.update()
             self.fpsCam.tick(15)
@@ -67,12 +70,12 @@ class GuiThread(threading.Thread):
 
     def get_screen_position(self, pos):
         x, y = pos
-        wx = ((self.zoom*x)+1)*(self.height/2)
-        wy = ((self.zoom*y)+1)*(self.width/2)
+        wx = ((self.zoom*x)+1)*(self.scaler/2)
+        wy = ((self.zoom*y)+1)*(self.scaler/2)
         return wx,wy
 
     def get_screen_length(self, length):
-        return ((self.zoom*length))*(self.height/2)
+        return ((self.zoom*length))*(self.scaler/2)
 
     # ENVIRONMENT
     env = [
